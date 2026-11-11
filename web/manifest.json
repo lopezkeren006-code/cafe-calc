@@ -1,0 +1,9 @@
+{
+  "name": "CaféCalc",
+  "short_name": "CaféCalc",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#18130f",
+  "theme_color": "#18130f",
+  "description": "Calculadora de precio por lata y por libra de café."
+}
