@@ -1,210 +1,205 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(const CafeCalcApp());
+
+const _background = Color(0xFF080D09);
+const _green = Color(0xFF39FF88);
+const _amber = Color(0xFFFFB74D);
+const _muted = Color(0xFFC4D2CA);
 
 class CafeCalcApp extends StatelessWidget {
   const CafeCalcApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const beige = Color(0xFFF5E6CC);
-    const verde = Color(0xFF3A8826);
-
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'CaféCalc',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
-        fontFamily: 'Arial Black',
         colorScheme: ColorScheme.fromSeed(
-          seedColor: verde,
-          brightness: Brightness.light,
+          seedColor: _green,
+          brightness: Brightness.dark,
         ),
-        scaffoldBackgroundColor: beige,
-        textTheme: ThemeData.light().textTheme.apply(
-              fontFamily: 'Arial Black',
-              bodyColor: Colors.black,
-              displayColor: Colors.black,
-            ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: verde,
-          foregroundColor: Colors.black,
-          centerTitle: true,
-        ),
-        useMaterial3: true,
+        scaffoldBackgroundColor: _background,
       ),
-      home: const CalculatorPage(),
+      home: const CalculadoraPage(),
     );
   }
 }
 
-class CalculatorPage extends StatefulWidget {
-  const CalculatorPage({super.key});
+class CalculadoraPage extends StatefulWidget {
+  const CalculadoraPage({super.key});
 
   @override
-  State<CalculatorPage> createState() => _CalculatorPageState();
+  State<CalculadoraPage> createState() => _CalculadoraPageState();
 }
 
-class _CalculatorPageState extends State<CalculatorPage> {
-  final _priceController = TextEditingController(text: '16000');
-  final _cansController = TextEditingController(text: '33');
-  final _benefitController = TextEditingController(text: '15');
-  final _poundsController = TextEditingController(text: '30');
+class _CalculadoraPageState extends State<CalculadoraPage> {
+  final _price = TextEditingController(text: '10000.00');
+  final _cans = TextEditingController(text: '32');
+  final _cost = TextEditingController(text: '15');
+  final _pounds = TextEditingController(text: '30');
 
   double _number(TextEditingController controller) {
-    final normalized = controller.text.trim().replaceAll(',', '.');
-    return double.tryParse(normalized) ?? 0;
+    return double.tryParse(controller.text.trim().replaceAll(',', '.')) ?? 0;
   }
 
-  double get _averagePrice =>
-      _number(_priceController) / _number(_cansController);
-
-  double get _pricePerCan =>
-      _averagePrice - _number(_benefitController);
-
-  double get _pricePerPound =>
-      _pricePerCan / _number(_poundsController);
-
-  String _format(double value) => value.toStringAsFixed(2);
-
-  Widget _headerCell(String text) => Container(
-        color: const Color(0xFF3A8826),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-      );
-
-  Widget _detailCell(String text, {bool bold = false}) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      );
-
-  Widget _valueCell(String text) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-        child: Text(
-          text,
-          textAlign: TextAlign.right,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-          ),
-        ),
-      );
-
-  Widget _inputCell(
-    TextEditingController controller, {
-    bool highlighted = false,
-  }) {
-    return Container(
-      color: highlighted ? const Color.fromARGB(255, 169, 219, 145) : null,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      alignment: Alignment.centerRight,
-      child: TextField(
-        controller: controller,
-        textAlign: TextAlign.right,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 16,
-        ),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(vertical: 16),
-        ),
-        onChanged: (_) => setState(() {}),
-      ),
-    );
-  }
-
-  TableRow _row(Widget units, Widget detail) =>
-      TableRow(children: [units, detail]);
+  String _format(double value) =>
+      value.isFinite ? value.toStringAsFixed(2) : '—';
 
   @override
   void dispose() {
-    _priceController.dispose();
-    _cansController.dispose();
-    _benefitController.dispose();
-    _poundsController.dispose();
+    _price.dispose();
+    _cans.dispose();
+    _cost.dispose();
+    _pounds.dispose();
     super.dispose();
+  }
+
+  Widget _input(
+    String label,
+    TextEditingController controller, {
+    bool highlighted = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F1B15),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: highlighted ? _green : const Color(0xFF214333),
+          ),
+          boxShadow: [
+            if (highlighted)
+              const BoxShadow(color: Color(0x5539FF88), blurRadius: 14),
+          ],
+        ),
+        child: Semantics(
+          label: label,
+          child: TextField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.right,
+            cursorColor: _green,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 0, 12, 0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: 1,
+                  child: Text(
+                    label,
+                    style: const TextStyle(color: _muted, fontSize: 14),
+                  ),
+                ),
+              ),
+              prefixIconConstraints: const BoxConstraints(minHeight: 54),
+              contentPadding: const EdgeInsets.fromLTRB(0, 14, 18, 14),
+              border: InputBorder.none,
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final cans = _number(_cansController);
-    final pounds = _number(_poundsController);
+    final cans = _number(_cans);
+    final pounds = _number(_pounds);
     final valid = cans > 0 && pounds > 0;
+    final average = _number(_price) / cans;
+    final perCan = average - _number(_cost);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'CaféCalc',
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
       body: SafeArea(
-        child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 46, 20, 32),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1060),
-              child: Table(
-                border: TableBorder.all(
-                  color: const Color(0xFF555047),
-                  width: 1,
-                ),
-                columnWidths: const {
-                  0: FlexColumnWidth(1),
-                  1: FlexColumnWidth(2),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              constraints: const BoxConstraints(maxWidth: 390),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _row(
-                    _headerCell('Unidades'),
-                    _headerCell('Detalle'),
+                  const Text(
+                    'CaféCalc',
+                    style: TextStyle(
+                      color: _green,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      shadows: [Shadow(color: _green, blurRadius: 13)],
+                    ),
                   ),
-                  _row(
-                    _inputCell(_priceController, highlighted: true),
-                    _detailCell('Precio Becamo hoy PH'),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: CustomPaint(
+                      painter: const _RingPainter(),
+                      child: SizedBox.square(
+                        dimension: 220,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 28),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Precio libra a pagar',
+                                style: TextStyle(color: _muted, fontSize: 14),
+                              ),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  valid ? _format(perCan / pounds) : '—',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 60,
+                                    height: 1.08,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: [
+                                      Shadow(color: _green, blurRadius: 22),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  _row(
-                    _inputCell(_cansController),
-                    _detailCell('Latas por carga', bold: true),
-                  ),
-                  _row(
-                    _valueCell(valid ? _format(_averagePrice) : '—'),
-                    _detailCell('Precio Prom lata', bold: true),
-                  ),
-                  _row(
-                    _inputCell(_benefitController),
-                    _detailCell('Costo Beneficiado', bold: true),
-                  ),
-                  _row(
-                    _valueCell(valid ? _format(_pricePerCan) : '—'),
-                    _detailCell('Precio por lata a pagar', bold: true),
-                  ),
-                  _row(
-                    _inputCell(_poundsController),
-                    _detailCell('libras por galon', bold: true),
-                  ),
-                  _row(
-                    _valueCell(valid ? _format(_pricePerPound) : '—'),
-                    _detailCell('Precio libra a pagar', bold: true),
+                  const SizedBox(height: 30),
+                  _input('Precio Becamo hoy PH', _price, highlighted: true),
+                  _input('Latas por carga', _cans),
+                  _input('Costo Beneficiado', _cost),
+                  _input('Libras por galón', _pounds),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: _ResultCard(
+                            label: 'Precio Prom lata',
+                            value: valid ? _format(average) : '—',
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _ResultCard(
+                            label: 'Precio por lata a pagar',
+                            value: valid ? _format(perCan) : '—',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -214,4 +209,74 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ),
     );
   }
+}
+
+class _ResultCard extends StatelessWidget {
+  const _ResultCard({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 92),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B1408),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD79C48)),
+        boxShadow: const [BoxShadow(color: Color(0x40FFB74D), blurRadius: 14)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFFE7D5B8), fontSize: 13),
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: _amber,
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                shadows: [Shadow(color: _amber, blurRadius: 14)],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RingPainter extends CustomPainter {
+  const _RingPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final ring = (Offset.zero & size).deflate(10);
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 11
+      ..strokeCap = StrokeCap.round;
+    const start = -math.pi / 2;
+    const sweep = 2 * math.pi - 0.30;
+    canvas.drawArc(
+      ring,
+      start,
+      sweep,
+      false,
+      stroke
+        ..color = _green
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9),
+    );
+    canvas.drawArc(ring, start, sweep, false, stroke..maskFilter = null);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RingPainter oldDelegate) => false;
 }
